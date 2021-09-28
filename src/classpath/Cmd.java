@@ -1,4 +1,4 @@
-
+package classpath;
 
 // 解析命令行中输入的java命令 以下是参考命令
 // java -version
@@ -8,7 +8,6 @@
 // java -classpath one/classpath oneclassname arg1 arg2
 
 import com.sun.tools.corba.se.idl.StringGen;
-
 public class Cmd{
     // 查看是否是正确的格式
     boolean isRight=true;
@@ -67,5 +66,15 @@ public class Cmd{
         System.out.println("Usage: java [-options] class [args...]\n");
     }
 
+    public static void main(String[] args){
+        Cmd cmd = new Cmd(args);
+        if (!cmd.isRight) cmd.printUsage();
+        else{
+            if (cmd.versionFlag) System.out.println("java version....");
+            else if(cmd.isHelp || cmd.args==null) cmd.printUsage();
+            // 是正确的命令就 将命令作为参数 调用启动jvm方法
+            else startJVM(cmd);
+        }
+    }
 
 }

@@ -33,7 +33,7 @@ public class ClassPath {
 
         String java_home=System.getenv("JAVA_HOME");
         if(java_home!=null) return java_home+File.separator+"jre";
-        throw  new RuntimeException("can not find jre folder!")
+        throw  new RuntimeException("can not find jre folder!");
     }
 
     void parseUserClasspath(String cpOption){

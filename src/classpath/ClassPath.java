@@ -1,6 +1,6 @@
 
 // 已经实现了对不同classpath的解析 这里是封装 对外提供一个统一的接口
-
+package classpath;
 
 import classpath.Entry;
 import classpath.WildcardEntry;

@@ -1,9 +1,12 @@
-package classfile.classconstant;
+
+// 常量池的抽象类 实现了常量池中所有常量的类型
+// 常量数据的第一字节是tag 用来区分常量类型
+//
 
 import classfile.ClassReader;
-import sun.reflect.ConstantPool;
+import classfile.ConstantPool;
 
-public abstract class ConstantInfo {
+public abstract class ConstantInfo{
     public static final int CONSTANT_Utf8 = 1;
     public static final int CONSTANT_Integer = 3;
     public static final int CONSTANT_Float = 4;
@@ -19,18 +22,23 @@ public abstract class ConstantInfo {
     public static final int CONSTANT_MethodType = 16;
     public static final int CONSTANT_InvokeDynamic = 18;
 
-    abstract void readInfo(ClassReader reader);
+    // 抽象方法读取信息 每种常量占用的字节数不同 需要具体实现
+    abstract void  readInfo(ClassReader reader);
 
+    // 表明常量类型是 上述的哪一种常量
     protected int type;
     public int getType(){return type;}
-    public static ConstantInfo readConstantInfo(ClassReader reader,ConstantPool constantPool){
-        int type = (reader.readUint8()+256)%256;
+
+    // 读取常量信息 读取tag信息 根据tag实现不同的常量类 并且添加到常量池数组中
+    private static ConstantInfo readConstantInfo(ClassReader reader, ConstantPool constantPool){
+        int type=(reader.readUint8()+256)%256;
         ConstantInfo info = create(type,constantPool);
         info.readInfo(reader);
         return info;
     }
 
-    private static ConstantInfo create(int type, ConstantPool constantPool){
+    // 从常量池中获取 确定类型 创建常量信息
+    private static ConstantInfo create(int type,ConstantPool constantPool){
         switch (type) {
             case CONSTANT_Utf8:
                 return new ConstantUtf8Info(1);
@@ -64,4 +72,6 @@ public abstract class ConstantInfo {
                 throw new RuntimeException("java.lang.ClassFormatError: constant pool tag!");
         }
     }
+
+
 }

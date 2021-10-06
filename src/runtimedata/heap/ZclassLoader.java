@@ -15,11 +15,96 @@
 // 5。 如果一个methodhandle实例最后的解析结果是 REF_getStatic REF_putStatic REF_invokeStatic 方法的句炳 会触发对应的REF类的加载
 
 
+import classpath.ClassPath;
+import com.sun.xml.internal.ws.api.ha.StickyFeature;
 import runtimedata.heap.ClassFile;
+import sun.jvm.hotspot.oops.AccessFlags;
 
+import java.util.HashMap;
+import java.util.Map;
 import java.util.zip.ZipFile;
 
 public class ZclassLoader {
+    ClassPath classPath;
+    // 缓存加载过的类
+    HashMap<String, Zclass> map;
+    public ZclassLoader(ClassPath classPath){
+        // 初始化两个变量
+        this.classPath = classPath;
+        this.map = new HashMap<String, Zclass>();
+
+        loadBasicClasses();
+        loadPrimitiveClasses();
+    }
+
+    private void loadBasicClasses(){
+        Zclass jlClassClass = loadClass("java/lang/Class");
+        for (Map.Entry<String, Zclass> entry:map.entrySet()){
+            Zclass jClass = entry.getValue();
+            if (jClass.jObject == null){
+                jClass.jObject = jlClassClass.newObject();
+                jClass.jObject.extra = jClass;
+            }
+        }
+    }
+
+    // 加载基本类型的类 void boolean byte
+    private void loadPrimitiveClasses(){
+        for(Map.Entry<String,String> entry:ClassNameHelper.primitiveTypes.entrySet()){
+            String className = entry.getKey();
+            loadPrimitiveClass(className);
+        }
+    }
+
+    //  加载基本类型
+    private void loadPrimitiveClass(String className){
+        Zclass clazz = new Zclass(AccessFlag.ACC_PUBLIC,className,this,true,null,new Zclass[]{});
+        clazz.jObject = map.get("java/lang/Class").newObject();
+        clazz.jObject.extra = clazz;
+        map.put(className,clazz);
+    }
+
+    public Zclass loadClass(String name){
+        // 如果缓存中有zclass 直接加载
+        if (map.containsKey(name)){
+            return map.get(name);
+        }
+        Zclass clazz;
+        // 如果是zclass数组
+        if (name.charAt(0)=='['){
+            clazz = loadArrayClass(name);
+        }else{
+            clazz = loadNonArrayClass(name);
+        }
+
+        // 为每一个class都关联一个元类
+        Zclass jlClassClass = map.get("java/lang/Class");
+        if (jlClassClass !=null){
+            clazz.jObject = jlClassClass.newObject();
+            clazz.jObject.extra = clazz;
+
+        }
+        return clazz;
+    }
+
+    private Zclass loadArrayClass(String name){
+        Zclass clazz = new Zclass(AccessFlags.ACC_PUBLIC,name,this,true,
+                loadClass("java/lang/Object"),
+                new Zclass[]{loadClass("java/lang/Cloneable"),
+                        loadClass("java/io/Serializable")
+                }
+                );
+        map.put(name,clazz);
+        return clazz;
+    }
+
+    private Zclass loadNonArrayClass(String name){
+        byte[] data = readClass(name);
+        Zclass clazz = defineClass(data);
+        link(clazz);
+        return clazz;
+    }
+
 
 
 // 类的全限定名：将。替换为/ 作为唯一确定的位置的一种写法
@@ -30,11 +115,49 @@ public class ZclassLoader {
     // 读取class文件 并且将字节码转换为zclass
     private byte[] readClass(String name){
         byte[] data = classPath.readClass(name);
-        return data;
+        if (data!=null){
+            return data;
+        }else{
+            throw new ClassCastException("class name:"+name);
+        }
     }
-    private Zclass paraseClass(byte[] data){
+
+    //
+    private Zclass defineClass(byte[] data){
+        Zclass clazz = parseClass(data);
+        clazz.loader = this;
+        resolveSuperClass(clazz);
+        resolveInterfaces(clazz);
+        map.put(clazz.thisClassName,clazz);
+        return clazz;
+    }
+
+
+    private Zclass parseClass(byte[] data){
         ClassFile cf = new ClassFile(data);
         return new Zclass(cf);
+    }
+
+    // 加载当前类的父类
+    private void resolveSuperClass(Zclass clazz){
+        if(!"java/lang/Object".equals(clazz.thisClassName)){
+            clazz.superClass = clazz.loader.loadClass(clazz.superClassNmme);
+        }
+    }
+
+    // 加载当前类的接口类
+    private void resolveInterfaces(Zclass clazz){
+        int count =  clazz.interfaceNames.length;
+        clazz.interfaces = new Zclass[count];
+        for (int i=0; i<count; i++){
+            clazz.interfaces[i] = clazz.loader.loadClass(clazz.interfacesNames[i]);
+        }
+    }
+
+    //
+    private void link(Zclass clazz){
+        verify(clazz);
+        prepare(clazz);
     }
 
     // 验证

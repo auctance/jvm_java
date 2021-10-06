@@ -1,209 +1,114 @@
-package runtimedata.heap;
+// 类加载器 将class文件加载到内存
 
-import classpath.ClassPath;
-import sun.jvm.hotspot.oops.AccessFlags;
+//  加载 验证 准备 初始化 卸载
+// 类的解析在初始化之前
+// 如果是多态 在初始化之后解析
+
+// 类未初始化 遇到以下五种情况 会立即初始化
+// 对于已经初始化的类 从方法区中读取
 
 
-import java.util.HashMap;
-import java.util.Map;
+// 1。 遇到new getstatic putstatic invokestatic 使用new实例化对象  读写类的静态变量（static final不需要初始化）
+// 2。 使用反射 调用类
+// 3。 初始化一个类 发现父类未初始化 对fulei先初始化
+// 4。 启动虚拟机时候 需要制定一个包含main方法的类 虚拟机会先初始化该类
+// 5。 如果一个methodhandle实例最后的解析结果是 REF_getStatic REF_putStatic REF_invokeStatic 方法的句炳 会触发对应的REF类的加载
+
+
+import runtimedata.heap.ClassFile;
+
+import java.util.zip.ZipFile;
 
 public class ZclassLoader {
-    ClassPath classPath;
-    HashMap<String, Zclass> map;
-
-    public ZclassLoader(ClassPath classPath){
-        this.classPath=classPath;
-        this.map=new HashMap<String,Zclass>();
-
-        loadBasicClasses();
-        loadPrimitiveClasses();
-    }
-
-    private void loadBasicClasses(){
-        Zclass jlClassClass = loadClass("java/lang/Class");
-        for(Map.Entry<String,Zclass> entry:map.entrySet()){
-            Zclass jClass=entry.getValue();
-            if(jClass.jObject==null){
-                jClass.jObject=jClassClass.newObject();
-                jClass.jObject.extra = jClass;
-            }
-        }
-    }
-
-    private void loadPrimitiveClasses(){
-        for(Map.Entry<String,String> entry:ClassNameHelper.primitiveTypes.entrySet()){
-            String className=entry.getKey();
-            loadPrimitiveClasses(className);
-        }
-    }
-
-    private void loadPrimitiveClass(String className){
-        Zclass clazz =new class(AccessFlag.ACC_PUBLIC,className,this,true,null,new Zclass[]{});
-        clazz.jObject=map.get("java/lang/Class").newObject();
-        map.put(className,clazz);
-    }
-
-    public Zclass loadClass(String name){
-        if (map.containsKey(name)){
-            return map.get(name);
-        }
-        Zclass clazz;
-        if (name.charAt(0)=='[') clazz=loadArrayClass(name);
-        else clazz = loadNonArrayClass(name);
-
-        Zclass jlClassClass = map.get("java/lang/Class");
-        if (jlClassClass != null) {
-            clazz.jObject = jlClassClass.newObject();
-            clazz.jObject.extra = clazz;
-        }
-        return clazz;
-    }
 
 
-    private Zclass loadArrayClass(String name) {
-        Zclass clazz = new Zclass(AccessFlag.ACC_PUBLIC, name, this, true,
-                loadClass("java/lang/Object"),
-                new Zclass[]{loadClass("java/lang/Cloneable"), loadClass("java/io/Serializable")});
-        map.put(name, clazz);
-        return clazz;
-    }
+// 类的全限定名：将。替换为/ 作为唯一确定的位置的一种写法
+// 加载阶段虚拟机需要做两件事情
+// 1。 通过类的全限定名来获取类的二进制字节流 寻找类所在路径并读取class文件 映射为classFile对象
+// 2。 将字节流代表的静态储存结构转孩奴为运行时动态储存结构 将classfile转换为zclass
 
-    private Zclass loadNonArrayClass(String name) {
-        byte[] data = readClass(name);
-        Zclass clazz = defineClass(data);
-        link(clazz);
-//        System.out.println("[Loaded  " + name + " from  " + name + "]");//因为我们没有返回加载的路径，所以这里只好以name来代替了；
-        return clazz;
-    }
-
-    /**
-     * 利用 ClassPath 把 class 文件读进来
-     *
-     * @param name 类名，eg：java.lang.String 或者包含 main 方法的主类名
-     * @return class 字节数据
-     */
-    private byte[] readClass(String name) {
+    // 读取class文件 并且将字节码转换为zclass
+    private byte[] readClass(String name){
         byte[] data = classPath.readClass(name);
-        if (data != null) {
-            return data;
-        } else {
-            throw new ClassCastException("class name: " + name);
-        }
+        return data;
     }
-
-
-    /*
-     * 首先把class文件数据转换成 ClassFile 对象，在转为 Zclass 对象；
-     * 加载父类
-     * 加载接口
-     * resolveSuperClass：是一个递归的过程，不断的加载父类信息
-     * */
-    private Zclass defineClass(byte[] data) {
-        Zclass clazz = parseClass(data);
-        clazz.loader = this;
-        resolveSuperClass(clazz);
-        resolveInterfaces(clazz);
-        map.put(clazz.thisClassName, clazz);
-        return clazz;
-    }
-
-    private Zclass parseClass(byte[] data) {
+    private Zclass paraseClass(byte[] data){
         ClassFile cf = new ClassFile(data);
         return new Zclass(cf);
     }
 
-    //加载当前类的父类,除非是Object类，否则需要递归调用LoadClass()方法加载它的超类
-    //默认情况下,父类和子类的类加载器是同一个;
-    private void resolveSuperClass(Zclass clazz) {
-        if (!"java/lang/Object".equals(clazz.thisClassName)) {
-            clazz.superClass = clazz.loader.loadClass(clazz.superClassName);
-        }
+    // 验证
+    // 确保字节码流符合虚拟机的要求
+    private void verify(Zclass clazz){
+
     }
 
-
-    //加载当前类的接口类
-    private void resolveInterfaces(Zclass clazz) {
-        int count = clazz.interfaceNames.length;
-        clazz.interfaces = new Zclass[count];
-        for (int i = 0; i < count; i++) {
-            clazz.interfaces[i] = clazz.loader.loadClass(clazz.interfaceNames[i]);
-        }
-    }
-
-
-    private void link(Zclass clazz) {
-        verify(clazz);
-        prepare(clazz);
-    }
-
-    //在执行类的任何代码之前要对类进行严格的检验,这里忽略检验过程,作为空实现;
-    private void verify(Zclass clazz) {
-    }
-
-    //给类变量分配空间并赋予初始值
-    private void prepare(Zclass clazz) {
+    // 准备
+    // 为静态变量分配内存 并且设置初始值
+    // 这里的初始值为类型的零值 并没有完成赋值
+    // 如果是final修饰的 直接完成赋值
+    private void prepare(Zclass clazz){
         calcInstanceFieldSlotIds(clazz);
         calcStaticFieldSlotIds(clazz);
         allocAndInitStaticVars(clazz);
     }
 
-    // 计算new一个对象所需的空间,单位是clazz.instanceSlotCount,主要包含了类的非静态成员变量(包含父类的)
-    // 但是这里并没有真正的申请空间，只是计算大小，同时为每个非静态变量关联 slotId
-    private void calcInstanceFieldSlotIds(Zclass clazz) {
+    // 计算new一个变量需要的空间
+    // 这里并没有申请空间 只是计算了大小 为非静态变量关联了slotId
+    private void calcInstanceFieldSlotIds(Zclass clazz){
         int slotId = 0;
-        if (clazz.superClass != null) {
+        if (clazz.superClass!=null){
             slotId = clazz.superClass.instanceSlotCount;
         }
-
-        for (Zfield field : clazz.fileds) {
-            if (!field.isStatic()) {
+        // 局部变量
+        for (Zfield field:clazz.fields){
+            if (!field.isStatic()){
                 field.slotId = slotId;
                 slotId++;
-                if (field.isLongOrDouble()) {
+                if (field.isLongOrDouble()){
                     slotId++;
                 }
             }
         }
-        clazz.instanceSlotCount = slotId;
+        clazz.instanceSlotCount=slotId;
     }
 
-
-    //计算类的静态成员变量所需的空间，不包含父类，同样也只是计算和分配 slotId，不申请空间
-    private void calcStaticFieldSlotIds(Zclass clazz) {
+    // 计算类的静态成员变量所需的空间 不包含父亲类
+    // 计算和分配slotId 暂时不分配空间
+    private void calcStaticFieldSlotIds(Zclass clazz){
         int slotId = 0;
-        for (Zfield field : clazz.fileds) {
-            if (field.isStatic()) {
+        for (Zfield field:clazz.fields){
+            if(field.isStatic()){
                 field.slotId = slotId;
                 slotId++;
-                if (field.isLongOrDouble()) {
+                if (field.isLongOrDouble){
                     slotId++;
                 }
             }
         }
-        clazz.staticSlotCount = slotId;
+        clazz.instanceSlotCount=slotId;
     }
 
-    // 为静态变量申请空间,注意:这个申请空间的过程,就是将所有的静态变量赋值为0或者null;
-    // 如果是 static final 的基本类型或者 String，其值会保存在ConstantValueAttribute属性中
-    private void allocAndInitStaticVars(Zclass clazz) {
+    // 为静态变量申请空间 即将所有的静态变量赋值为0或者null
+    // static final, string 不一样的处理
+    private void allocAndInitStaticVars(Zclass clazz){
         clazz.staticVars = new Slots(clazz.staticSlotCount);
-        for (Zfield field : clazz.fileds) {
-            if (field.isStatic() && field.isFinal()) {
-                initStaticFinalVar(clazz, field);
+        for (Zfield field:clazz.fields){
+            if (field.isStatic() && field.isFinal()){
+                initStaticFinalVar(clazz,field);
             }
         }
     }
 
 
-    // 为static final 修饰的成员赋值,这种类型的成员是ConstantXXXInfo类型的,该info中包含真正的值;
-    private void initStaticFinalVar(Zclass clazz, Zfield zfield) {
+    // 为static final的成员赋值
+    private void initStaticFinalVar(Zclass clazz, Zfield zfield){
         Slots staticVars = clazz.staticVars;
         RuntimeConstantPool runtimeConstantPool = clazz.getRuntimeConstantPool();
         int index = zfield.constValueIndex;
         int slotId = zfield.slotId;
-
-        if (index > 0) {
-            switch (zfield.getDescriptor()) {
+        if (index>0){
+            switch (zfield.getDescriptor()){
                 case "Z":
                 case "B":
                 case "C":
@@ -231,6 +136,8 @@ public class ZclassLoader {
                     break;
             }
         }
-
     }
+
+    // 解析 将class文件中的符号引用替换为直接引用的过程
+
 }

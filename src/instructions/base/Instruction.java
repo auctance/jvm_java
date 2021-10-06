@@ -4,6 +4,7 @@
 
 import instructions.base.BytecodeReader;
 
+// 所有指令解析 都需要完成读取操作数 以及 执行栈帧中指令的逻辑
 public interface Instruction {
     // 从字节码中取操作数
     void fetchOperands(BytecodeReader reader);

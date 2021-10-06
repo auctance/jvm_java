@@ -1,5 +1,5 @@
 package runtimedata.heap;
-
+// 代表单独的类信息 需要转换到Zclass中去
 public class ClassFile {
     private int minorVersion;
     private int majorVersion;

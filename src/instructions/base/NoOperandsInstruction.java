@@ -1,14 +1,14 @@
-package instructions.base;
+// 很多指令的操作数是类似的
 
-/**
- * Author: zhangxin
- * Time: 2017/5/5 0005.
- * Desc:表示没有操作数的指令，所以没有定义 任何字段。FetchOperands方法也是空实现，什么也不用读
- */
+// 这里定义一些抽象的类 实现instruction接口 实现 取数 方法
+// 由具体的类去实例化这些抽象类 实现execute方法
+
+
+import instructions.base.BytecodeReader;
+
 public abstract class NoOperandsInstruction implements Instruction{
-
     @Override
-    public void fetchOperands(BytecodeReader reader) {
+    public void fetchOperands(BytecodeReader reader){
 
     }
 }

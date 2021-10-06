@@ -1,5 +1,6 @@
 package instructions;
-
+// 有了指令的具体实现 对外提供一个创建指令的接口
+// 根据不同的操作吗创建不同的指令
 import instructions.base.Instruction;
 import instructions.comparisons.dcmp.DCMPG;
 import instructions.comparisons.dcmp.DCMPL;

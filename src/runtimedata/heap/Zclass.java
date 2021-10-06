@@ -1,17 +1,34 @@
-package runtimedata.heap;
+// 这里是线程运行时候 共享区
+// 包括方法区和堆
+
+// Zclass 代表共享的类信息
+import runtimedata.heap.ZclassLoader;
 
 public class Zclass {
+    // 当前类的访问标志
     private int accessFlags;
+    // 当前类名字
     public String thisClassName;
-    public String superClassName;
-    public String[] interfaceNames;//接口名字(完全限定名,不可以为null,若为实现接口,数组大小为0)
-    private RuntimeConstantPool runtimeConstantPool;//运行时常量池,注意和class文件中常量池区别;
-    Zfield[] fileds;        //字段表,包括静态和非静态，此时并不分配 slotId；下面的staticVars 是其子集
-    Zmethod[] methods;      //方法表，包括静态和非静态
-    ZclassLoader loader;    //类加载器
-    Zclass superClass;      //当前类的父类class,由类加载时,给父类赋值;
-    Zclass[] interfaces;    //当前类的接口class,由类加载时,给父类赋值;
-    int instanceSlotCount;  //非静态变量占用slot大小,这里只是统计个数(从顶级父类Object开始算起)
-    int staticSlotCount;    // 静态变量所占空间大小
-    Slots staticVars;      // 存放静态变量
+    // 父亲类名字
+    public String superClassNmme;
+    // 接口名字
+    public String[] interfaceNames;
+    // 运行时常量池
+    private RuntimeConstantPool runtimeConstantPool;
+    // 字段表
+    Zfield[] fields;
+    // 方法表
+    Zmethod[] methods;
+    // 类加载器
+    ZclassLoader loader;
+    //  父亲类class
+    Zclass superClass;
+    // 接口类class
+    Zclass[] interfaces;
+    // 非静态变量slot大小
+    int instanceSlotCount;
+    // 静态变量空间大小
+    int staticSlotCount;
+    // 存放静态变量
+    Slots staticVars;
 }

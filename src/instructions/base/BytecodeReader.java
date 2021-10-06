@@ -1,12 +1,9 @@
 package instructions.base;
 
+
+// 读取字节码的辅助类 根据具体情况 调用不同的字节码读取方法
 import Utils.ByteUtils;
 
-/**
- * Author: zhangxin
- * Time: 2017/5/5 0005.
- * Desc:
- */
 public class BytecodeReader {
     private byte[] code;  //byte的范围四-128~127,和go中的byte:0~255不同,所以在取数据的时候需要注意;
     private int pc;

@@ -30,11 +30,12 @@ public class ZipJarEntry extends Entry{
 
     // 从zip或者jar文件中读取class文件
     @Override
-    byte[] readClass(String className) throw IOException{
+    byte[] readClass(String className) throws IOException{
         File file = new File(absPath);
         ZipInputStream zin = null;
         BufferedInputStream in = null;
         ByteArrayOutputStream out = null;
+
         ZipFile zf = new ZipFile(file);
         ZipEntry ze = zf.getEntry(className);
         if (ze==null) return null;

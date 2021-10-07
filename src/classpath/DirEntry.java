@@ -8,9 +8,9 @@ import com.sun.xml.internal.xsom.impl.scd.Step;
 import java.io.*;
 import java.nio.Buffer;
 
-public class DirEntry {
+public class DirEntry extends Entry{
     // 判断路径是否存在 如果存在和classname拼接 使用IO读取其中的字节码 并且返回
-    String absDir;
+    private String  absDir;
     // 构造方法 返回绝对路径 便于和classname拼接
     public DirEntry(String path){
         File dir = new File(path);
@@ -20,6 +20,10 @@ public class DirEntry {
     @Override
     byte[] readClass(String className) throws IOException{
         File file = new File(absDir,className);
+        //
+        if (!file.exists()){
+            return null;
+        }
         byte[] tmp = new byte[1024];
         BufferedInputStream in = null;
         ByteArrayOutputStream out = null;

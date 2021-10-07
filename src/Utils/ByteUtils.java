@@ -50,7 +50,7 @@ public class ByteUtils {
 
     public static float byte2Float32(byte[] b){
         int i=byteToInt32(b);
-        return Flaot.intBitsToFloat(i);
+        return Float.intBitsToFloat(i);
 
     }
     public static double bytw2Double64(byte[] b){

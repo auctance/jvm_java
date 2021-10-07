@@ -1,6 +1,7 @@
 package classfile;
 import Utils.ByteUtils;
 // class文件的组成 结构
+// 也就是class文件的内容
 
 import classfile.attribute.AttributeInfo;
 import com.sun.tools.classfile.SourceFile_attribute;

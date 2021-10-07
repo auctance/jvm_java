@@ -1,8 +1,9 @@
-
+package classfile.attribute;
 // 定义class文件中各种属性的集合
 
 // 也就是属性的容器 属性的抽象
 
+import Utils.ByteUtils;
 import classfile.ClassReader;
 import classfile.ConstantPool;
 

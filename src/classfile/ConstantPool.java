@@ -1,10 +1,12 @@
 package classfile;
 
-import classfile.classconstant.ConstantInfo;
+import classfile.classconstant.*;
 
 public class ConstantPool {
+    // 常量池的抽象 保存所有常量
     ConstantInfo[] infos;
     public ConstantInfo[] getInfos(){return infos;}
+    // 常量数量
     private int constantPoolCount;
     private int realConstantPoolCount;
 

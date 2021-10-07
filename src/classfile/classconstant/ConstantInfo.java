@@ -1,4 +1,4 @@
-
+package classfile.classconstant;
 // 常量池的抽象类 实现了常量池中所有常量的类型
 // 常量数据的第一字节是tag 用来区分常量类型
 //
@@ -30,7 +30,7 @@ public abstract class ConstantInfo{
     public int getType(){return type;}
 
     // 读取常量信息 读取tag信息 根据tag实现不同的常量类 并且添加到常量池数组中
-    private static ConstantInfo readConstantInfo(ClassReader reader, ConstantPool constantPool){
+    public static ConstantInfo readConstantInfo(ClassReader reader, ConstantPool constantPool){
         int type=(reader.readUint8()+256)%256;
         ConstantInfo info = create(type,constantPool);
         info.readInfo(reader);

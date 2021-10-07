@@ -4,6 +4,7 @@ import Utils.ByteUtils;
 // 也就是class文件的内容
 
 import classfile.attribute.AttributeInfo;
+import classfile.attribute.SourceFileAttribute;
 import com.sun.tools.classfile.SourceFile_attribute;
 
 import javax.sound.midi.Soundbank;

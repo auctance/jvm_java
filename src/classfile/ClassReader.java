@@ -2,6 +2,8 @@ package classfile;
 
 // 读取class字节码文件的reader 包含一个index 指示当前要读的字符数组的索引
 
+import Utils.ByteUtils;
+
 public class ClassReader {
     private byte[] data;
     private int index=0;

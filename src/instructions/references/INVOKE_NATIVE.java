@@ -3,7 +3,6 @@ package instructions.references;
 import instructions.base.NoOperandsInstruction;
 import runtimedata.Zframe;
 import runtimedata.heap.Zmethod;
-import znative.NativeMethod;
 import znative.RegisterCenter;
 
 /**

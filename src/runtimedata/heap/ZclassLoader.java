@@ -64,6 +64,21 @@ public class ZclassLoader {
         map.put(className,clazz);
     }
 
+    public static HashMap<String, String> primitiveTypes;
+
+    static {
+        primitiveTypes = new HashMap<String , String >();
+        primitiveTypes.put("void","V");
+        primitiveTypes.put("boolean", "Z");
+        primitiveTypes.put("byte", "B");
+        primitiveTypes.put("short", "S");
+        primitiveTypes.put("int", "I");
+        primitiveTypes.put("long", "J");
+        primitiveTypes.put("char", "C");
+        primitiveTypes.put("float", "F");
+        primitiveTypes.put("double", "D");
+    }
+
     public Zclass loadClass(String name){
         // 如果缓存中有zclass 直接加载
         if (map.containsKey(name)){

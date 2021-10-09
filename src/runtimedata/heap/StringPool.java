@@ -1,7 +1,5 @@
 package runtimedata.heap;
 
-import runtimedata.Zobject;
-
 import java.util.HashMap;
 
 // 串池

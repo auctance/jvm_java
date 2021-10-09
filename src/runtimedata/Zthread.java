@@ -3,13 +3,15 @@
 
 // 首先实现线程的基本结构
 
-import runtimedata.Zframe;
-import runtimedata.Zstack;
+package runtimedata;
+import runtimedata.heap.*;
 
+// 定义线程结构体 每个线程中都有一个虚拟机栈的引用
+// 虚拟机栈可以是连续的空间 也可以不是
 public class Zthread {
-    int pc;
+    private int pc;
     // 虚拟机栈的引用
-    Zstack zstack;
+    private Zstack stack;
     // 默认栈帧大小为 1024 个
     public Zthread(){stack = new Zstack(1024);}
     // pc 记住指令执行到的位置 所以pc本身是一个int变量
@@ -18,7 +20,7 @@ public class Zthread {
         this.pc=pc;
     }
     // 将栈帧压入虚拟机栈
-    public void pushFrame(Zframe frame){zstack.push(frame);}
+    public void pushFrame(Zframe frame){stack.push(frame);}
 
     public Zframe popFrame(){return stack.pop();}
 
@@ -27,4 +29,23 @@ public class Zthread {
     public Zframe createFrame(int maxLocals,int maxStack){
         return new Zframe(this,maxLocals,maxStack);
     }
+
+    public Zframe createFrame(Zmethod method){
+        return new Zframe(this,method);
+    }
+
+    public boolean isStackEmpty(){
+        return stack.size==0;
+    }
+
+    public void clearStack(){
+        while(!isStackEmpty()){
+            stack.pop();
+        }
+    }
+
+    public Zframe[] getFrames(){
+        return stack.getFrames();
+    }
+
 }

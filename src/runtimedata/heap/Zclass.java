@@ -2,7 +2,6 @@
 // 包括方法区和堆
 
 // Zclass 代表共享的类信息
-import runtimedata.Zobject;
 import runtimedata.heap.ZclassLoader;
 
 public class Zclass {

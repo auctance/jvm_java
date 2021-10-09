@@ -1,9 +1,6 @@
 package znative.java.lang;
 
-import runtimedata.Zobject;
 import znative.NativeMethod;
-
-import javax.naming.Name;
 
 public class Nthrowable {
     public static class fillInStackTrace implements NativeMethod{

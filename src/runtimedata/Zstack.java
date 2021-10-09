@@ -16,7 +16,7 @@ public class Zstack {
     }
 
     // 新添加一个栈帧
-    void push(Zframe zframe){
+    void push(Zframe frame){
         if (size>maxSize){
             throw new StackOverflowError("no space in stack!");
 
@@ -46,5 +46,14 @@ public class Zstack {
             throw new EmptyStackException();
         }
         return  _top;
+    }
+
+    Zframe[] getFrames(){
+        Zframe[] frames = new Zframe[size];
+        int i=0;
+        for (Zframe frame= _top; frame!=null; frame =frame.lower){
+            frames[i]  =frame;
+        }
+        return frames;
     }
 }

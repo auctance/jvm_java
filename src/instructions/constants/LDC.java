@@ -6,13 +6,11 @@ import runtimedata.OperandStack;
 import runtimedata.Zframe;
 import runtimedata.heap.*;
 
-// ldc 指令的功能 用来加载基本类型 字符串字面值
-// 现在扩展ldc指令
-// 根据ldc操作数得到的 运行时常量池中的常量
-// 如果是classref类型的 就将其zclass的jobject对象放到操作数栈
-
-
-
+/**
+ * @author zachaxy
+ * @date 17/12/26
+ * desc:获取操作数index，通过 index 来获取运行时常量池中的常量,并将其压入操作数栈
+ */
 public class LDC extends Index8Instruction {
     @Override
     public void execute(Zframe frame) {

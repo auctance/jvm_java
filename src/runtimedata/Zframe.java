@@ -1,8 +1,9 @@
 // 这里定义栈帧
 // 栈顶为栈内的基本元素
 
-import runtimedata.LocalVars;
-import runtimedata.OperandStack;
+// 栈帧 执行方法所需的局部变量表大小和操作数栈深度是编译器提前计算好的
+// 储存在class文件中methodinfo结构的code属性中
+package runtimedata;
 
 public class Zframe {
     // 当前栈帧的前一个栈帧引用
@@ -12,6 +13,7 @@ public class Zframe {
     // 操作数栈
     OperandStack operandStack;
     Zthread zthread;
+    Zmethod method;
     // pc
     int nextPc;
 
@@ -22,6 +24,13 @@ public class Zframe {
         // 声明最大空间的局部变量 以及 操作数栈
         localVars = new LocalVars(maxLocals);
         operandStack = new OperandStack(maxStack);
+    }
+    // overload
+    public Zframe(Zthraed thread, Zmethod method){
+        this.thread = thread;
+        this.method = method;
+        localVars = new LocalVars(method.getMaxLocals());
+        operandStack = new OperandStack(method.getMaxStack());
     }
 
     // get set方法
@@ -44,5 +53,17 @@ public class Zframe {
 
     public void setNextPc(int nextPc){
         this.nextPc = nextPc;
+    }
+
+    public Zmethod getMethod() {
+        return method;
+    }
+
+    public void setMethod(Zmethod method) {
+        this.method = method;
+    }
+
+    public void revertNextPc(){
+        this.nextPc = thread.getPc();
     }
 }

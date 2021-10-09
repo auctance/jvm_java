@@ -7,7 +7,6 @@ import java.util.Scanner;
 
 import instructions.InstructionFactory;
 import instructions.base.BytecodeReader;
-import runtimedata.Zobject;
 import runtimedata.heap.StringPool;
 import znative.RegisterCenter
 

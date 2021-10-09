@@ -1,6 +1,5 @@
 package znative.java.lang;
 
-import runtimedata.Zobject;
 import runtimedata.heap.StringPool;
 import znative.NativeMethod;
 

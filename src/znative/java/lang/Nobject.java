@@ -1,5 +1,7 @@
 package znative.java.lang;
 
+import runtimedata.Zframe;
+import runtimedata.heap.Zobject;
 import znative.NativeMethod;
 
 public class Nobject {

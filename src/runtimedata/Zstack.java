@@ -1,4 +1,4 @@
-// 虚拟机栈的基本结构 以及一些基本方法
+package runtimedata;// 虚拟机栈的基本结构 以及一些基本方法
 
 import runtimedata.Zframe;
 
@@ -11,7 +11,7 @@ public class Zstack {
     // 栈顶的帧
     private Zframe _top;
     // 构造方法 调用时候自动生成一个虚拟机栈
-    private Zstack(int maxSize){
+    public Zstack(int maxSize){
         this.maxSize=maxSize;
     }
 

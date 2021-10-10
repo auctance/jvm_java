@@ -5,6 +5,9 @@
 // 储存在class文件中methodinfo结构的code属性中
 package runtimedata;
 
+import classfile.attribute.CodeAttribute;
+import runtimedata.heap.Zmethod;
+
 public class Zframe {
     // 当前栈帧的前一个栈帧引用
     Zframe lower;
@@ -12,7 +15,7 @@ public class Zframe {
     LocalVars localVars;
     // 操作数栈
     OperandStack operandStack;
-    Zthread zthread;
+    Zthread thread;
     Zmethod method;
     // pc
     int nextPc;
@@ -26,7 +29,7 @@ public class Zframe {
         operandStack = new OperandStack(maxStack);
     }
     // overload
-    public Zframe(Zthraed thread, Zmethod method){
+    public Zframe(Zthread thread, Zmethod method){
         this.thread = thread;
         this.method = method;
         localVars = new LocalVars(method.getMaxLocals());
@@ -47,11 +50,11 @@ public class Zframe {
         return thread;
     }
 
-    public int getNextPc() {
+    public int getNextPC() {
         return nextPc;
     }
 
-    public void setNextPc(int nextPc){
+    public void setNextPC(int nextPc){
         this.nextPc = nextPc;
     }
 
@@ -63,7 +66,8 @@ public class Zframe {
         this.method = method;
     }
 
-    public void revertNextPc(){
+    public void revertNextPC(){
         this.nextPc = thread.getPc();
     }
+
 }

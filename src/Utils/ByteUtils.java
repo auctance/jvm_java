@@ -53,8 +53,9 @@ public class ByteUtils {
         return Float.intBitsToFloat(i);
 
     }
-    public static double bytw2Double64(byte[] b){
+    public static double byte2Double64(byte[] b){
         long l = byteToLong64(b);
         return Double.longBitsToDouble(l);
     }
+
 }

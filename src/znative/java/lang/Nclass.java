@@ -1,6 +1,10 @@
 package znative.java.lang;
 
+import runtimedata.Zframe;
 import runtimedata.heap.StringPool;
+import runtimedata.heap.Zclass;
+import runtimedata.heap.ZclassLoader;
+import runtimedata.heap.Zobject;
 import znative.NativeMethod;
 
 public class Nclass {

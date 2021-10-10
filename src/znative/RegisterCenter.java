@@ -1,6 +1,10 @@
 package znative;
 
+import runtimedata.Zframe;
 import znative.NativeMethod;
+import znative.java.lang.Nclass;
+import znative.java.lang.Nobject;
+import znative.java.lang.Nthrowable;
 
 import java.util.HashMap;
 

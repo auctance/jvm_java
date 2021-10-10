@@ -4,6 +4,8 @@
 // 两个连续的元素可以用来存放一个long或者double类型
 package runtimedata;
 
+import runtimedata.heap.Zobject;
+
 public class Slot {
     public int num;
     public Zobject ref;

@@ -1,5 +1,7 @@
 package runtimedata;
 
+import runtimedata.heap.Zobject;
+
 // 栈帧中的操作数栈
 // 大小在编译期间已经确定 可以用slot数组实现
 // 是用数组模拟的栈 对外接口需要是栈的形式

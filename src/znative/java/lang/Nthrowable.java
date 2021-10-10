@@ -1,5 +1,10 @@
 package znative.java.lang;
 
+import runtimedata.Zframe;
+import runtimedata.Zthread;
+import runtimedata.heap.Zclass;
+import runtimedata.heap.Zmethod;
+import runtimedata.heap.Zobject;
 import znative.NativeMethod;
 
 public class Nthrowable {
@@ -17,7 +22,7 @@ public class Nthrowable {
             Zframe[] frames = thread.getFrames();
             NStackTraceElement[] stes = new NStackTraceElement[frames.length-skip];
             for (int i=skip; i<frames.length;i++){
-                stes[i-skip] = createStackTraceElements(frames[i]);
+                stes[i-skip] = createStackTraceElement(frames[i]);
             }
             return stes;
 

@@ -1,51 +1,68 @@
-// jvm在运行时候 以线程为载体
-// 运行时数据区 包括共享的堆、方法区 也包括线程私有的本地方法栈、虚拟机栈以及pc
-
-// 首先实现线程的基本结构
-
 package runtimedata;
-import runtimedata.heap.*;
 
-// 定义线程结构体 每个线程中都有一个虚拟机栈的引用
-// 虚拟机栈可以是连续的空间 也可以不是
+import runtimedata.heap.Zmethod;
+
+/**
+ * Author: zhangxin
+ * Time: 2017/5/4 0004.
+ * Desc: 定义Thread结构体,目前只定义了pc和stack两个字段,每个线程中都持有一个虚拟机栈的引用
+ * Java虚拟机规范对Java虚拟机栈的约束也相当宽松,
+ * 虚拟机栈可以是连续的空间，也可以不连续
+ * 可以是固定大小，也可以在运行时动态扩展
+ * <p>
+ * 如果Java虚拟机栈有大小限制，且执行线程所需的栈空间超出了这个限制，会导致StackOverflowError异常抛出。
+ * 如果Java虚拟机栈可以动态扩展，但是内存已经耗尽，会导致OutOfMemoryError异常抛出。
+ * <p>
+ * 其实Java命令提供了-Xss选项来设置Java虚拟机栈大小
+ */
 public class Zthread {
-    private int pc;
-    // 虚拟机栈的引用
-    private Zstack stack;
-    // 默认栈帧大小为 1024 个
-    public Zthread(){stack = new Zstack(1024);}
-    // pc 记住指令执行到的位置 所以pc本身是一个int变量
-    public int getPc(){return pc;}
-    public void setPc(int pc){
-        this.pc=pc;
-    }
-    // 将栈帧压入虚拟机栈
-    public void pushFrame(Zframe frame){stack.push(frame);}
+    private int pc;         //该PC也不是自己修改的,而是由外部传入供当前线程所持有的;
+    private Zstack stack; //Stack结构体（Java虚拟机栈）的引用;
 
-    public Zframe popFrame(){return stack.pop();}
-
-    public Zframe getCurrentFrame(){return stack.top();}
-
-    public Zframe createFrame(int maxLocals,int maxStack){
-        return new Zframe(this,maxLocals,maxStack);
+    public Zthread() {
+        //默认栈的大小是1024,也就是说可以存放1024个栈帧
+        stack = new Zstack(1024);
     }
 
-    public Zframe createFrame(Zmethod method){
-        return new Zframe(this,method);
+    public int getPc() {
+        return pc;
     }
 
-    public boolean isStackEmpty(){
-        return stack.size==0;
+    public void setPc(int pc) {
+        this.pc = pc;
     }
 
-    public void clearStack(){
-        while(!isStackEmpty()){
+    public void pushFrame(Zframe frame) {
+        stack.push(frame);
+    }
+
+    public Zframe popFrame() {
+        return stack.pop();
+    }
+
+    public Zframe getCurrentFrame() {
+        return stack.top();
+    }
+
+    public Zframe createFrame(int maxLocals, int maxStack) {
+        return new Zframe(this, maxLocals, maxStack);
+    }
+
+    public Zframe createFrame(Zmethod method) {
+        return new Zframe(this, method);
+    }
+
+    public boolean isStackEmpty() {
+        return stack.size == 0;
+    }
+
+    public void clearStack() {
+        while (!isStackEmpty()) {
             stack.pop();
         }
     }
 
-    public Zframe[] getFrames(){
+    public Zframe[] getFrames() {
         return stack.getFrames();
     }
-
 }

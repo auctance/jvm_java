@@ -77,7 +77,7 @@ public class CodeAttribute extends AttributeInfo{
             return endPc;
         }
 
-        public int getHandlePc() {
+        public int getHandlerPc() {
             return handlePc;
         }
 
